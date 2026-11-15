@@ -1,0 +1,4 @@
+# Markdown 必须按 UTF-8 文本入库。
+# 一旦混入 NUL 字节（例如 UTF-16 片段），Git 会把 .md 判成二进制，
+# GitHub 就无法按 Markdown 渲染，表现为整页乱码。
+*.md text

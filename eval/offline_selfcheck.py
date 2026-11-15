@@ -830,6 +830,43 @@ def main() -> int:
 
     check("一键启动断言全程零模型调用", counter["n"] == 0, f"counter={counter['n']}")
 
+    # 12e. README 编码卫生。历史上文件末尾曾混入一段 UTF-16LE 残留（含 NUL），
+    # Git 会把 Markdown 判成二进制（i/-text），GitHub 渲染即乱码。此处从字节层拦住回归。
+    print("\n[12e] README 编码与仓库文本卫生")
+    readme_bytes = (ROOT / "README.md").read_bytes()
+    try:
+        readme_text = readme_bytes.decode("utf-8")
+        readme_utf8 = True
+    except UnicodeDecodeError:
+        readme_text, readme_utf8 = "", False
+    check("README 严格 UTF-8、无 BOM、无 NUL、无替换符",
+          readme_utf8
+          and not readme_bytes.startswith(b"\xef\xbb\xbf")
+          and "\x00" not in readme_text
+          and "\ufffd" not in readme_text,
+          f"{len(readme_bytes)} bytes")
+    check("README 结尾无 UTF-16 残留，正文结构完整",
+          readme_text.startswith("# campus-rules-agent")
+          and "## 10." in readme_text
+          and readme_text.rstrip().endswith("本仓库不含任何真实密钥。"))
+    import subprocess as _subprocess  # noqa: E402
+    try:
+        _tracked = _subprocess.check_output(
+            ["git", "-C", str(ROOT), "ls-files"], text=True,
+            stderr=_subprocess.DEVNULL,
+        ).splitlines()
+        _nul_files = [
+            f for f in _tracked
+            if not f.lower().endswith((".png", ".jpg", ".jpeg", ".ico", ".db", ".npy"))
+            and (ROOT / f).is_file()
+            and b"\x00" in (ROOT / f).read_bytes()
+        ]
+    except (OSError, _subprocess.SubprocessError):
+        _nul_files = []
+        check("仓库文本文件扫描跳过（git 不可用）", True)
+    else:
+        check("所有已跟踪文本文件均无 NUL 污染", not _nul_files, ",".join(_nul_files))
+
     # 13. 清理 + 零调用断言
     print("\n[13] 清理与零 API 调用断言")
     for sid in ("offline-smoke", "offline-cli", "selfcheck-run", "selfcheck-guard",
