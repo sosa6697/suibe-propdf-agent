@@ -1,0 +1,63 @@
+# ---------------- 密钥与本地配置 ----------------
+# 真实密钥只放本地 .env，绝不入库
+.env
+.env.*
+!.env.example
+
+# ---------------- 虚拟环境 ----------------
+.venv/
+venv/
+env/
+
+# ---------------- Python 缓存与构建产物 ----------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ---------------- 运行时产物（索引缓存 / 会话库 / 日志）----------------
+var/
+*.db
+*.db-*
+*.sqlite3
+*.log
+logs/
+
+# ---------------- 大体积数据（只读引用外部目录，不入库）----------------
+vectors.npy
+meta.jsonl
+chunks.jsonl
+校规源文件.json
+*.npy
+*.jsonl
+!eval/golden.jsonl
+
+# ---------------- 评测产物（可复现，不入库）----------------
+eval/results/
+var/traces/
+
+# ---------------- 测试 / 覆盖率 / 临时文件 ----------------
+.coverage
+coverage.xml
+htmlcov/
+*.pkl
+*.bak
+*.tmp
+*.swp
+*~
+
+# ---------------- 编辑器 / 系统 ----------------
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ---------------- 演示资产（刻意入库，供 README 直接引用）----------------
+# docs/ 下的截图与看板快照是历史回放基线，不含任何用户提示词原文，保持可追踪。
+!docs/
+!docs/*.png
+!docs/*.html

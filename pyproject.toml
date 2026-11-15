@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "campus-rules-agent"
+version = "0.6.0"
+description = "上海对外经贸大学校规问答 Agent：准确性优先的可观测 RAG 流水线"
+requires-python = ">=3.10"
+readme = "README.md"
+dependencies = [
+    "numpy>=1.26",
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+    "jieba>=0.42",
+    "rank_bm25>=0.2.2",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.4"]
+
+[project.scripts]
+campus-rules = "campus_rules.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

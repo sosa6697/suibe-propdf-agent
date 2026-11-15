@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>校规问答 · 每一条回答都有依据</title>
+<style>
+:root{
+  --bg:#f4f6fa; --panel:#ffffff; --panel-2:#fafbfe; --line:#e3e8f0; --fg:#1b2029;
+  --muted:#6b7485; --accent:#2f5fe0; --accent-2:#eaf0ff; --accent-fg:#ffffff;
+  --ok:#0f7b4f; --ok-bg:#e8f6ef; --err:#b42318; --err-bg:#fdeceb;
+  --warn:#9a5b00; --warn-bg:#fff5e2; --chip:#eef2f8; --code:#f6f8fc;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 28px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1218;--panel:#181d26;--panel-2:#1d232e;--line:#2c3341;--fg:#e9edf5;
+  --muted:#98a2b3;--accent:#86a9ff;--accent-2:#202b45;--accent-fg:#0f1218;
+  --ok:#5ad39b;--ok-bg:#162b23;--err:#ff8f85;--err-bg:#2e1c1c;
+  --warn:#e8b562;--warn-bg:#33291b;--chip:#232a36;--code:#141922;
+  --shadow:0 1px 2px rgba(0,0,0,.2),0 8px 28px rgba(0,0,0,.25);}
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{height:100vh;display:grid;grid-template-columns:248px minmax(0,1fr)}
+.side{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+.brand{padding:20px 18px 14px;border-bottom:1px solid var(--line)}
+.brand .logo{display:flex;align-items:center;gap:9px;font-weight:650;font-size:15px;letter-spacing:.2px}
+.brand .mark{width:28px;height:28px;border-radius:9px;background:var(--accent);color:var(--accent-fg);
+  display:grid;place-items:center;font-size:15px;font-weight:700;flex:none}
+.brand .tag{color:var(--muted);font-size:12px;margin-top:6px;padding-left:37px}
+.newbtn{margin:14px 14px 8px;border:1px solid var(--line);background:var(--panel-2);
+  border-radius:9px;padding:9px 12px;text-align:left;font-size:13px;transition:.15s}
+.newbtn:hover{border-color:var(--accent);color:var(--accent)}
+.slist{flex:1;overflow:auto;padding:4px 10px 12px}
+.slabel{color:var(--muted);font-size:11px;letter-spacing:.6px;padding:8px 8px 6px;text-transform:uppercase}
+.sitem{padding:9px 10px;border-radius:8px;margin-bottom:3px;font-size:13px;
+  display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--muted)}
+.sitem:hover{background:var(--panel-2)}
+.sitem.on{background:var(--accent-2);color:var(--accent);font-weight:550}
+.sitem .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;opacity:.55}
+.sitem .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.settings{border-top:1px solid var(--line);padding:12px 14px 16px;font-size:12px}
+.settings label{display:block;color:var(--muted);margin-bottom:5px}
+.settings input[type=text]{width:100%;background:var(--code);border:1px solid var(--line);
+  border-radius:7px;padding:7px 9px;font-size:12px;outline:none}
+.settings input[type=text]:focus{border-color:var(--accent)}
+.toggle{display:flex;align-items:center;gap:8px;margin:11px 0 4px;cursor:pointer;color:var(--fg)}
+.toggle input{accent-color:var(--accent);width:15px;height:15px}
+.links{display:flex;gap:12px;margin-top:10px;color:var(--muted);flex-wrap:wrap}
+.links a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.links a:hover{color:var(--accent)}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{padding:14px 26px;border-bottom:1px solid var(--line);background:var(--panel);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.top h1{font-size:15px;margin:0;font-weight:650}
+.pill{font-size:11.5px;border-radius:999px;padding:3px 10px;border:1px solid var(--line);
+  background:var(--chip);color:var(--muted);white-space:nowrap}
+.pill.live{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.pill.rec{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.top .spacer{flex:1}
+
+.stream{flex:1;overflow:auto;padding:24px 26px 12px;scroll-behavior:smooth}
+.inner{max-width:840px;margin:0 auto}
+.notice{border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--panel);
+  border-radius:10px;padding:11px 14px;font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.notice b{color:var(--fg)}
+.turn{margin-bottom:26px}
+.urow{display:flex;justify-content:flex-end;margin-bottom:12px}
+.ububble{background:var(--accent);color:var(--accent-fg);border-radius:14px 14px 4px 14px;
+  padding:10px 14px;max-width:78%;white-space:pre-wrap;word-break:break-word;box-shadow:var(--shadow)}
+.arow{display:flex;gap:11px;align-items:flex-start}
+.avatar{width:30px;height:30px;border-radius:9px;background:var(--accent-2);color:var(--accent);
+  display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
+.abody{min-width:0;flex:1}
+.ameta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.ameta .who{font-size:12px;font-weight:600}
+.ameta .stamp{font-size:11px;color:var(--muted)}
+.abubble{background:var(--panel);border:1px solid var(--line);border-radius:4px 14px 14px 14px;
+  padding:13px 15px;white-space:pre-wrap;word-break:break-word;box-shadow:var(--shadow)}
+.abubble.refused{background:var(--panel-2);border-style:dashed}
+.cite{display:inline-block;border:0;background:var(--accent-2);color:var(--accent);
+  border-radius:5px;padding:0 5px;margin:0 1px;font-size:11.5px;font-weight:650;line-height:1.6;vertical-align:baseline}
+.cite:hover{outline:1px solid var(--accent)}
+
+.basis{margin-top:11px;border:1px solid var(--line);border-radius:11px;background:var(--panel);overflow:hidden}
+.basis-head{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--panel-2);
+  border-bottom:1px solid var(--line);flex-wrap:wrap}
+.basis-head .t{font-size:12.5px;font-weight:650;display:flex;align-items:center;gap:6px}
+.basis-head .t .ic{color:var(--accent)}
+.basis-head .sp{flex:1}
+.fold{border:0;background:transparent;color:var(--muted);font-size:12px;padding:2px 6px}
+.fold:hover{color:var(--accent)}
+.basis-body{padding:12px 13px 14px}
+.status{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px}
+.badge{font-size:11.5px;border-radius:6px;padding:3px 9px;background:var(--chip);color:var(--muted)}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.err{background:var(--err-bg);color:var(--err)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.reasons{font-size:12px;color:var(--muted);margin:0 0 11px;padding-left:16px}
+.reasons li{margin-bottom:2px}
+.evtitle{font-size:11.5px;color:var(--muted);letter-spacing:.4px;margin:0 0 8px;
+  display:flex;align-items:center;gap:8px}
+.evtitle::after{content:"";flex:1;height:1px;background:var(--line)}
+.evlist{display:grid;gap:8px}
+.ev{border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:var(--panel-2);
+  transition:border-color .2s,box-shadow .2s;scroll-margin-top:18px}
+.ev.flash{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-2)}
+.ev-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.ev-label{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-2);
+  border-radius:5px;padding:2px 7px;white-space:nowrap}
+.ev-name{font-size:12.5px;font-weight:600;word-break:break-word;flex:1;min-width:120px}
+.ev-page{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.ev-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.ev-tag{font-size:10.5px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.ev-tag.comp{color:var(--warn);border-color:transparent;background:var(--warn-bg)}
+.ev-text{font-size:12.5px;color:var(--fg);opacity:.86;white-space:pre-wrap;word-break:break-word;
+  max-height:112px;overflow:auto;line-height:1.62}
+.empty{font-size:12.5px;color:var(--muted);padding:8px 0}
+
+.composer{border-top:1px solid var(--line);background:var(--panel);padding:12px 26px 18px}
+.composer .inner{max-width:840px;margin:0 auto}
+.sysmsg{max-width:840px;margin:8px auto;padding:8px 12px;border-radius:10px;
+  font-size:12.5px;line-height:1.6;text-align:center;color:var(--muted);
+  background:var(--chip);border:1px solid var(--line)}
+.sysmsg.warn{color:var(--warn);background:var(--warn-bg);border-color:transparent}
+.sysmsg.err{color:var(--err);background:var(--err-bg);border-color:transparent}
+.sysmsg.busy{color:var(--accent);background:var(--panel-2)}
+.inputrow{display:flex;gap:9px;align-items:flex-end}
+textarea{flex:1;min-height:52px;max-height:160px;resize:vertical;background:var(--code);
+  border:1px solid var(--line);border-radius:11px;padding:11px 13px;outline:none;line-height:1.55}
+textarea:focus{border-color:var(--accent)}
+.send{border:0;background:var(--accent);color:var(--accent-fg);border-radius:11px;
+  padding:11px 19px;font-weight:600;white-space:nowrap;height:52px}
+.send:disabled{opacity:.5;cursor:not-allowed}
+.hint{font-size:11.5px;color:var(--muted);margin-top:7px}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid currentColor;
+  border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (max-width:880px){
+  .app{grid-template-columns:1fr}
+  .side{display:none}
+  .stream{padding:18px 14px 10px}
+  .composer{padding:10px 14px 14px}
+  .top{padding:12px 14px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo"><span class="mark">校</span> 校规问答</div>
+      <div class="tag">每条回答都附答案依据</div>
+    </div>
+    <button class="newbtn" id="newbtn">＋ 新建会话</button>
+    <div class="slist" id="slist"></div>
+    <div class="settings">
+      <label for="base">本地服务地址（留空＝同源）</label>
+      <input type="text" id="base" placeholder="http://127.0.0.1:8000">
+      <label class="toggle"><input type="checkbox" id="live"> 连接本地服务（真实问答）</label>
+      <div class="links">
+        <a href="/demo" target="_blank">Agent 轨迹演示</a>
+        <a href="/dashboard" target="_blank">数据中台</a>
+        <a href="/docs" target="_blank">接口文档</a>
+      </div>
+      <div style="margin-top:10px;color:var(--muted);font-size:11px;line-height:1.5">
+        会话仅保存在当前页面内存，不写入浏览器存储。<br>默认回放为真实历史运行记录，非实时生成。
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="top">
+      <h1 id="title">校规问答</h1>
+      <span class="pill rec" id="modepill">离线回放 · 真实历史记录</span>
+      <span class="pill" id="healthpill">未连接</span>
+      <span class="spacer"></span>
+      <span class="pill" id="countpill">0 轮</span>
+    </div>
+
+    <div class="stream" id="stream"><div class="inner" id="messages"></div></div>
+
+    <div class="composer">
+      <div class="inner">
+        <div class="inputrow">
+          <textarea id="q" placeholder="请输入你的问题…"></textarea>
+          <button class="send" id="send">发送</button>
+        </div>
+        <div class="hint" id="hint">当前为离线回放模式。勾选左下角「连接本地服务」后，发送才会真实问答并显示该次答案的依据。</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* 演示回放数据：由 var/smoke_b_result.json 等真实联调记录 + 只读 meta.jsonl 生成，
+   构建时注入，非手写、非伪造。每条都标注 recorded=true。 */
+const DEMO_RUNS = [{"recorded":true,"recorded_at":"2026-11-15 14:53","query":"学生违纪处分有哪几种？","answer":"学生违纪处分的种类为：警告 [E1]；严重警告 [E1]；记过 [E1]；留校察看 [E1]；开除学籍 [E1]。","refused":false,"degraded":true,"degrade_reasons":["embedding 调用失败，向量召回关闭：[embedding] HTTP 404: "],"verification":{"ok":true,"issues":[],"warnings":[],"method":"rules+llm","citations":["E1"],"refusal":false},"evidences":[{"label":"E1","doc_title":"2018-11-11_上海对外经贸大学学生违纪处分管理规定","page_no":1,"score":0.977963,"source":"rerank_api","chunk_id":"2018-11-11_上海对外经贸大学学生违纪处分管理规定-p001::001::0f88bd13","excerpt":"律处分。学生在校外参加教学实习、考察、社会实践、挂职\n锻炼等社会活动有违纪行为的，参照本规定给予纪律处分。 \n第四条 对有违反法律法规、本规定以及其他校纪校规\n的学生，学校应当给予批评教育，并可视情节轻重，给予如\n下纪律处分： \n（一）警告； \n（二）严重警告； \n（三）记过； \n（四）留校察看； \n（五）开除学籍。 \n学生有违反校纪校规的行为，但情节轻微不足以给予纪\n律处分的，应当由学生所在学院给予通报批评，督促其改正\n错误。 \n第五条 学生违反校纪校规，有下列情形之一，且危害"},{"label":"E2","doc_title":"2018-11-11_上海对外经贸大学学生违纪处分管理规定","page_no":9,"score":0.69166,"source":"rerank_api","chunk_id":"2018-11-11_上海对外经贸大学学生违纪处分管理规定-p009::000::31cb7847","excerpt":"9 \n第三十七条 屡次违反学校规定受到纪律处分，经教育\n不改的，给予开除学籍处分。 \n \n第三章 附则 \n第三十八条 本规定中的给予某一级别“以上处分”包\n含该级别处分。 \n第三十九条 本规定由学生处负责解释。 \n第四十条 本规定自2017年9月1日起施行。原《上海对\n外经贸大学学生违纪处分管理规定》（沪贸院学[2009]117号）\n同时废止。 \n \n \n \n上海对外经贸大学 \n2017 年6 月修订"},{"label":"E3","doc_title":"2018-11-11_上海对外经贸大学学生违纪处分管理规定","page_no":4,"score":0.660146,"source":"rerank_api","chunk_id":"2018-11-11_上海对外经贸大学学生违纪处分管理规定-p004::002::edb86e73","excerpt":"限一般为12个月，从处分决定作出之日起算。受处分的学生，\n由学生所在学院负责考察，在处分期内认真悔改者可按期解\n除处分；有显著进步表现者，可提前解除处分。受留校察看\n处分的学生，经教育不改或处分期内又有违纪行为的，给予\n开除学籍处分。"},{"label":"E4","doc_title":"2023-09-04_上海对外经贸大学全日制本科生学分制学籍管理规定","page_no":8,"score":0.618986,"source":"rerank_api","chunk_id":"2023-09-04_上海对外经贸大学全日制本科生学分制学籍管理规定-p008::000::1ba82bb7","excerpt":"8 \n缓考不及格者不再补考，应当重新学习。 \n第二十四条 学生考试违纪、考试作弊或严重考试作弊\n的，根据《上海对外经贸大学学生考试规定》和《上海对外\n经贸大学学生违纪处分管理规定》处理，并取消该课程的考\n试成绩，总评成绩以零分计。 \n第二十五条 专科起点本科学生应当取得主修专业教学\n计划规定必修课程（三、四年级）的学分和规定选修课程（四\n年）学分的二分之一。 \n专科起点本科学生，原则上不再修读所就读专业一、二\n年级的课程。因特殊情况必须修读的，由所在学院提出，报\n教务处核准后，安排修读。 \n第二十六条 学生因退学等…"},{"label":"E5","doc_title":"2021-01-12_上海对外经贸大学2020年管理文件汇编","page_no":301,"score":0.588383,"source":"rerank_api","chunk_id":"2021-01-12_上海对外经贸大学2020年管理文件汇编-p301::001::b2778f48","excerpt":"60 以下 \nF \n0 \n \n\n\n\n\n\n\n课程学分\n课程成绩绩点\n课程学分\n平均学分绩点\n \n第十二条 学生考试违纪、考试作弊或严重考试作弊\n的，根据《上海对外经贸大学学生考试规定》和《上海对外\n经贸大学学生违纪处分管理规定》处理，并取消该课程的考\n试成绩，总评成绩以零分计，应当重新学习该课程。"}],"version_conflicts":[],"source_note":"由 var/ 历史联调记录 + 只读 meta.jsonl 生成"},{"recorded":true,"recorded_at":"2026-11-15 14:45","query":"学校食堂几点关门？","answer":"现有校规文件中未找到该问题的明确依据，建议咨询学校相关职能部门。","refused":false,"degraded":true,"degrade_reasons":["向量召回已按配置关闭（ENABLE_VECTOR_RECALL=false），仅走 BM25","rerank API 调用失败，降级为规则重排：[rerank] HTTP 400: {\"request_id\":\"bc8b7342-70d1-9f91-89e8-296ebc841093\",\"code\":\"InvalidParameter\",\"message\":\"<400> InternalError.Algo.InvalidParameter: Field required: input.query"],"verification":{"ok":true,"issues":[],"warnings":[],"method":"rules+llm","citations":[],"refusal":true},"evidences":[{"label":"E1","doc_title":"2018-11-11_上海对外经贸大学学生违纪处分管理规定","page_no":1,"score":0.622365,"source":"rule_rerank","chunk_id":"2018-11-11_上海对外经贸大学学生违纪处分管理规定-p001::000::db73bf17","excerpt":"1 \n \n上海对外经贸大学学生违纪处分管理规定\n \n第一章 总 则 \n第一条 为维护学校正常的教育教学秩序和生活秩序，\n规范管理，保证学生良好的学习和生活环境，保障学生健康\n成长，根据教育部《普通高等学校学生管理规定》和《高等\n学校学生行为准则》等有关规定，结合学校实际，制定本规\n定。 \n第二条 本规定适用于我校接受普通高等学历教育的\n学生。对接受高等学历继续教育的学生、港澳台侨学生、留\n学生违纪行为的处理，参照本规定执行。 \n第三条 学生在校内有违纪行为的，按照本规定给予纪\n律处分。学生在校外参加教学实习、考察、…"},{"label":"E2","doc_title":"2021-10-18_家庭经济困难学生认定办法","page_no":6,"score":0.600104,"source":"rule_rerank","chunk_id":"2021-10-18_家庭经济困难学生认定办法-p006::000::24daae57","excerpt":"6\n消学生的认定资格和已获得的相关资助，并追回资助资金。\n情节严重的，依据《上海对外经贸大学学生违纪处分管理规\n定》严肃处理。 \n第十七条 学校和学院要加强学生资助信息安全管理，\n不得泄露学生资助信息。 \n第十八条 学校家庭经济困难认定工作是开展精准资\n助的基础，学校强化督查考核，在遵循“实事求是，有错必\n究”原则的基础上，实行监督问责机制。 \n \n第六章 附 则 \n第十九条 本办法由学生处负责解释。 \n第二十条 本办法自公布之日起施行。 \n \n附表：上海市普通高等学校家庭经济困难学生认定申请\n表"},{"label":"E3","doc_title":"2020-09-17_上海对外经上海对外经贸大学第二学士学位专业管理办法（试行）","page_no":3,"score":0.532616,"source":"rule_rerank","chunk_id":"2020-09-17_上海对外经上海对外经贸大学第二学士学位专业管理办法（试行）-p003::001::91f75127","excerpt":"根据《上海对外经贸大学学生考试规定》和《上海对外经贸\n大学学生违纪处分管理规定》处理，并取消该课程的考试成\n绩，总评成绩以零分计，应当重新学习该课程。 \n \n第四章 转专业、休学与退学 \n第十三条 学生不可申请转专业。 \n第十四条 学生原则上不可申请休学。 \n第十五条 学生有下述情况之一，应予退学： \n（一）未经批准连续两周未参加学校规定的教学活动\n的； \n（二）超过学校规定期限未注册而又未履行暂缓注册手\n续的； \n（三）经学校指定医院诊断，患有疾病或者意外伤残无\n法继续在校学习的； \n（四）有关文件规定的其他必须…"},{"label":"E4","doc_title":"2018-11-11_上海对外经贸大学学生违纪处分管理规定","page_no":3,"score":0.499507,"source":"rule_rerank","chunk_id":"2018-11-11_上海对外经贸大学学生违纪处分管理规定-p003::001::c66ddccf","excerpt":"第十条 学校对学生作出处分决定之前，由学生处告知\n学生作出决定的事实、理由及依据，并告知学生享有陈述和\n申辩的权利，听取学生的陈述和申辩。 \n第十一条 学校对学生作出处分，应当出具处分决定书。\n处分决定书包括下列内容： \n（一）学生的基本信息； \n（二）作出处分的事实和证据； \n（三）处分的种类、依据、期限； \n（四）申诉的途径和期限； \n（五）其他必要内容。 \n第十二条 处分决定书由学生所在学院送交被处分学生\n本人，并履行签收手续，学生拒绝签收的，可以以留置方式\n送达；已离校的，可以采取邮寄方式送达；难以联系的，…"},{"label":"E5","doc_title":"2021-09-15_上海对外经贸大学本科毕业论文管理条例","page_no":2,"score":0.450212,"source":"rule_rerank","chunk_id":"2021-09-15_上海对外经贸大学本科毕业论文管理条例-p002::003::75be9d61","excerpt":"论文者，毕业论文记为0分，并按《上海对外经贸大学学生违纪处分管理规定》给予相应的纪律处\n分。\n（四）论文定稿后，由指导教师进行审阅，并给出评语和评分。\n（五）学院按专业组成评阅小组评阅论文，并给出评语和评分。\n（六）论文答辩由学院组织。\n1.若指导教师或评阅小组对毕业论文的评阅成绩为“不及格”时，学生不能参加论文答辩。指导"}],"version_conflicts":[],"source_note":"由 var/ 历史联调记录 + 只读 meta.jsonl 生成"}];
+
+const $ = (s) => document.querySelector(s);
+const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g,
+  (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cleanTitle = (t) => String(t || '').replace(/^\d{4}-\d{2}-\d{2}_/, '').replace(/^上海对外经贸大学/, '');
+// 刻意不提供推荐问题 / 快捷语句：让学生自己组织提问，界面只负责给出状态反馈。
+
+let seq = 0;
+const sessions = [];
+let activeId = null;
+let live = false;
+let busy = false;
+
+function uid() { seq += 1; return 's' + seq; }
+
+function newSession(title) {
+  const s = {id: uid(), title: title || '新会话', messages: [], recorded: false};
+  sessions.unshift(s);
+  activeId = s.id;
+  render();
+  return s;
+}
+
+function loadDemo() {
+  DEMO_RUNS.forEach((run, i) => {
+    const s = {
+      id: uid(), title: run.query, recorded: true,
+      messages: [
+        {role: 'user', text: run.query},
+        {role: 'assistant', text: run.answer, result: run, recorded: true},
+      ],
+    };
+    sessions.push(s);
+    if (i === 0) activeId = s.id;
+  });
+  if (!sessions.length) newSession('新会话');
+}
+
+function active() { return sessions.find((s) => s.id === activeId) || sessions[0]; }
+
+function shortTitle(t) {
+  const x = String(t || '').replace(/\s+/g, ' ').trim();
+  return x.length > 16 ? x.slice(0, 16) + '…' : x || '新会话';
+}
+
+function render() {
+  const s = active();
+  if (s) activeId = s.id;
+  $('#slist').innerHTML =
+    '<div class="slabel">会话</div>' +
+    sessions.map((x) =>
+      `<div class="sitem ${x.id === activeId ? 'on' : ''}" data-sid="${esc(x.id)}">` +
+      `<span class="dot"></span><span class="txt">${esc(shortTitle(x.title))}</span>` +
+      (x.recorded ? '<span style="font-size:10px;opacity:.7">回放</span>' : '') + '</div>'
+    ).join('');
+  $('#slist').querySelectorAll('.sitem').forEach((el) => {
+    el.onclick = () => { activeId = el.dataset.sid; render(); $('#stream').scrollTop = 0; };
+  });
+
+  $('#title').textContent = s ? shortTitle(s.title) : '校规问答';
+  $('#countpill').textContent = (s ? s.messages.filter((m) => m.role === 'user').length : 0) + ' 轮';
+  $('#modepill').textContent = s && s.recorded
+    ? '离线回放 · 真实历史记录' : (live ? '已连接本地服务' : '离线模式');
+  $('#modepill').className = 'pill ' + (s && s.recorded ? 'rec' : (live ? 'live' : ''));
+
+  const box = $('#messages');
+  const notice = '<div class="notice"><b>关于「答案依据」</b>：每条回答下方都会列出检索到的校规原文、' +
+    '文件与页码、精排来源、引用校验结果，以及拒答 / 降级 / 版本冲突原因。' +
+    '与校规无关的问题会在入口直接拦截，<b>不消耗任何模型调用</b>，依据区会显示命中规则。' +
+    '答案里的 <b style="color:var(--accent)">E1</b> 等徽标可点击定位到对应证据卡片。</div>';
+  if (!s || !s.messages.length) {
+    box.innerHTML = notice + '<div class="empty">还没有对话。在下方输入你的问题即可开始。</div>';
+    return;
+  }
+  box.innerHTML = notice + s.messages.map((m, i) =>
+    m.role === 'user'
+      ? `<div class="turn"><div class="urow"><div class="ububble">${esc(m.text)}</div></div></div>`
+      : m.role === 'status'
+        ? `<div class="sysmsg ${esc(m.tone || 'info')}">${m.pending ? '<span class="spin"></span> ' : ''}${esc(m.text)}</div>`
+        : assistantHtml(m, i)
+  ).join('');
+  bindCites(box);
+}
+
+function assistantHtml(m, idx) {
+  const r = m.result || {};
+  const stamp = m.recorded
+    ? `历史真实运行记录 · ${esc(r.recorded_at || '2026-11-15')} · 非实时生成`
+    : (m.at || '刚刚');
+  const isRefused = !!r.refused;
+  const answer = linkCites(esc(m.text || ''));
+  return `<div class="turn">
+    <div class="arow">
+      <div class="avatar">校</div>
+      <div class="abody">
+        <div class="ameta"><span class="who">校规助手</span><span class="stamp">${stamp}</span></div>
+        <div class="abubble ${isRefused ? 'refused' : ''}">${answer || '<span class="empty">（无答案）</span>'}</div>
+        ${basisHtml(r, idx)}
+      </div>
+    </div></div>`;
+}
+
+function linkCites(text) {
+  return text.replace(/\[(E\d+)\]/g,
+    (all, label) => `<button class="cite" data-cite="${esc(label)}">${esc(label)}</button>`);
+}
+
+function basisHtml(r, idx) {
+  const v = r.verification || {};
+  const evs = Array.isArray(r.evidences) ? r.evidences : [];
+  const conflicts = r.version_conflicts || [];
+  const redline = r.redline_refusals || [];
+  const degrade = r.degrade_reasons || [];
+  const rel = r.relevance || {};
+  const badges = [];
+
+  if (r.guard_blocked) {
+    const g = r.guard || {};
+    badges.push('<span class="badge err">入口过滤 · 与校规无关</span>');
+    badges.push('<span class="badge ok">模型调用 0 次 · 未进入检索链路</span>');
+    if (g.matched_rules && g.matched_rules.length)
+      badges.push(`<span class="badge">命中规则 ${g.matched_rules.map(esc).join('、')}</span>`);
+  } else {
+    if (Object.keys(v).length) {
+      const ok = v.ok === true;
+      badges.push(`<span class="badge ${ok ? 'ok' : 'err'}">引用校验 ${ok ? '通过' : '未通过'} · ${esc(v.method || '-')}</span>`);
+      if (v.citations && v.citations.length)
+        badges.push(`<span class="badge">答案引用 ${v.citations.map(esc).join('、')}</span>`);
+    } else {
+      badges.push('<span class="badge warn">引用校验未执行</span>');
+    }
+    if (r.refused || isRefusalRecord(r)) badges.push('<span class="badge warn">按红线拒答</span>');
+    else badges.push('<span class="badge ok">已生成答案</span>');
+    if (r.degraded) badges.push('<span class="badge warn">链路降级</span>');
+    if (conflicts.length) badges.push(`<span class="badge warn">版本冲突 ${conflicts.length} 处</span>`);
+    if (rel.semantic_source && rel.semantic_source !== 'disabled')
+      badges.push(`<span class="badge">相关性：${esc(rel.semantic_source)}</span>`);
+  }
+  if (typeof r.api_calls === 'number')
+    badges.push(`<span class="badge">模型调用 ${r.api_calls} 次</span>`);
+
+  const notes = [];
+  if (r.guard_blocked)
+    notes.push('本次在入口层被拦截：问题与校规无关，未发起任何模型调用，也未检索证据。');
+  else if (isRefusalRecord(r))
+    notes.push('本次未生成答案：证据不足或问题超出校规语料范围，下方仅为检索到的候选，不构成回答。');
+  redline.forEach((x) => notes.push('红线判定：' + x));
+  if (v.issues && v.issues.length) v.issues.forEach((x) => notes.push('核查问题：' + x));
+  conflicts.forEach((x) => notes.push('版本冲突：' + x));
+  degrade.forEach((x) => notes.push('降级原因：' + x));
+
+  const cards = evs.length ? evs.map((e) => {
+    const tags = [
+      e.source === 'rerank_api' ? 'API 精排' : '规则重排',
+      '相关度 ' + (typeof e.score === 'number' ? e.score.toFixed(4) : '-'),
+    ];
+    return `<div class="ev" id="ev-${idx}-${esc(e.label || '')}">
+      <div class="ev-top">
+        <span class="ev-label">${esc(e.label || 'E')}</span>
+        <span class="ev-name">${esc(cleanTitle(e.doc_title || e.citation))}</span>
+        <span class="ev-page">第 ${esc(e.page_no != null ? e.page_no : '?')} 页</span>
+      </div>
+      <div class="ev-tags">${tags.map((t) => `<span class="ev-tag">${esc(t)}</span>`).join('')}
+        ${e.is_compilation ? '<span class="ev-tag comp">历年汇编 · 已降权</span>' : ''}</div>
+      <div class="ev-text">${esc(e.excerpt || e.citation || '（原文片段不可用）')}</div>
+    </div>`;
+  }).join('') : (r.guard_blocked
+      ? '<div class="empty">入口过滤已拦截，未进入检索链路，因此没有证据卡片。</div>'
+      : '<div class="empty">本次没有检索到可用证据。</div>');
+
+  return `<section class="basis" data-basis="${idx}">
+    <div class="basis-head">
+      <span class="t"><span class="ic">▣</span> 答案依据 · ${evs.length} 条证据</span>
+      <span class="sp"></span>
+      <button class="fold" data-fold="${idx}">收起</button>
+    </div>
+    <div class="basis-body" id="basis-body-${idx}">
+      <div class="status">${badges.join('')}</div>
+      ${notes.length ? `<ul class="reasons">${notes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      <div class="evtitle">校规原文证据（可点击答案中的 E 编号定位）</div>
+      <div class="evlist">${cards}</div>
+    </div>
+  </section>`;
+}
+
+function isRefusalRecord(r) {
+  return !!r.refused && String(r.answer || '').indexOf('未找到该问题的明确依据') >= 0;
+}
+
+function bindCites(root) {
+  root.querySelectorAll('.cite').forEach((btn) => {
+    btn.onclick = () => {
+      const turn = btn.closest('.turn');
+      const card = turn && turn.querySelector('.ev[id$="-' + btn.dataset.cite + '"]');
+      if (!card) return;
+      card.scrollIntoView({behavior: 'smooth', block: 'center'});
+      card.classList.add('flash');
+      setTimeout(() => card.classList.remove('flash'), 1600);
+    };
+  });
+  root.querySelectorAll('.fold').forEach((btn) => {
+    btn.onclick = () => {
+      const body = $('#basis-body-' + btn.dataset.fold);
+      const hidden = body.style.display === 'none';
+      body.style.display = hidden ? '' : 'none';
+      btn.textContent = hidden ? '收起' : '展开依据';
+    };
+  });
+}
+
+function push(role, text, extra, target) {
+  const s = target || active();
+  if (!s) return null;
+  const m = Object.assign({role: role, text: text, at: now()}, extra || {});
+  s.messages.push(m);
+  // 标题取第一条用户问题；前面可能已有状态气泡，不能再用 messages.length === 1 判断
+  if (role === 'user' && !s.messages.some((x) => x !== m && x.role === 'user')) s.title = text;
+  render();
+  const st = $('#stream');
+  st.scrollTop = st.scrollHeight;
+  return m;
+}
+
+function pushStatus(text, tone, opts, target) {
+  const s = target || active();
+  if (!s) return null;
+  const m = Object.assign(
+    {role: 'status', text: text, tone: tone || 'info', at: now(), sid: s.id}, opts || {});
+  s.messages.push(m);
+  render();
+  const st = $('#stream');
+  st.scrollTop = st.scrollHeight;
+  return m;
+}
+
+function dropStatus(m) {
+  if (!m) return;
+  // 等待期间用户可能切换了会话，按消息里记录的 sid 找回去删
+  const s = sessions.find((x) => x.id === m.sid) || active();
+  if (!s) return;
+  const i = s.messages.indexOf(m);
+  if (i < 0) return;
+  s.messages.splice(i, 1);
+  render();
+}
+
+function now() {
+  const d = new Date();
+  return d.toTimeString().slice(0, 5);
+}
+
+function baseUrl() {
+  const raw = $('#base').value.trim().replace(/\/+$/, '');
+  return raw;
+}
+
+async function checkHealth() {
+  if (!live) { $('#healthpill').textContent = '未连接'; $('#healthpill').className = 'pill'; return; }
+  $('#healthpill').textContent = '检测中…';
+  try {
+    const res = await fetch(baseUrl() + '/health', {method: 'GET'});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const h = await res.json();
+    $('#healthpill').textContent = '服务已连接' +
+      (h.embedding && h.embedding.indexOf('ready=False') >= 0 ? ' · 部分能力降级' : '');
+    $('#healthpill').className = 'pill live';
+  } catch (e) {
+    $('#healthpill').textContent = '连接失败：' + e.message;
+    $('#healthpill').className = 'pill';
+    const s = active();
+    const last = s && s.messages.length ? s.messages[s.messages.length - 1] : null;
+    const text = '本地服务连接失败：' + e.message + '。请确认服务已启动且地址正确。';
+    if (!last || last.text !== text) pushStatus(text, 'err', {}, s);
+  }
+}
+
+async function send() {
+  const q = $('#q').value.trim();
+  const s = active();
+  const last = s && s.messages.length ? s.messages[s.messages.length - 1] : null;
+
+  // 所有分支都在对话流里留下可见反馈，不再只改底部小字或静默 return
+  if (busy) {
+    if (!last || last.role !== 'status' || last.tone !== 'busy')
+      pushStatus('上一条问题还在处理中，请稍候…', 'warn', {}, s);
+    return;
+  }
+  if (!q) { pushStatus('请先输入问题再发送。', 'warn', {}, s); return; }
+  if (!live) {
+    push('user', q, {}, s);
+    $('#q').value = '';
+    pushStatus('当前是离线回放模式，不会伪造答案。请勾选左下角「连接本地服务」后再发送真实问题。',
+               'warn', {}, s);
+    $('#hint').textContent = '离线回放模式不会伪造答案；原因已显示在对话中。';
+    return;
+  }
+
+  busy = true;
+  $('#send').disabled = true;
+  $('#send').innerHTML = '<span class="spin"></span> 检索中';
+  push('user', q, {}, s);
+  $('#q').value = '';
+  const sid = 'chat-' + s.id;
+  const waiting = pushStatus('正在检索校规文件并生成答案，请稍候…', 'busy', {pending: true}, s);
+  try {
+    const res = await fetch(baseUrl() + '/ask', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({query: q, session_id: sid}),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status + '：' + (await res.text()).slice(0, 160));
+    const data = await res.json();
+    dropStatus(waiting);
+    push('assistant', data.answer || '（无答案）', {result: data}, s);
+    $('#hint').textContent = '依据来自本次真实问答；所有证据与校验状态均随回答一并返回。';
+  } catch (e) {
+    dropStatus(waiting);
+    // 失败不伪造一条「助手回答」，只给明确的错误反馈
+    pushStatus('请求失败，未产生答案：' + e.message, 'err', {}, s);
+    $('#hint').textContent = '请求失败，未产生答案；原因已显示在对话中。';
+  } finally {
+    busy = false;
+    $('#send').disabled = false;
+    $('#send').textContent = '发送';
+  }
+}
+
+$('#newbtn').onclick = () => { newSession('新会话'); $('#q').focus(); };
+$('#send').onclick = send;
+$('#q').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
+$('#live').onchange = (e) => {
+  live = e.target.checked;
+  $('#hint').textContent = live
+    ? '已连接本地服务：发送会真实问答（会消耗模型 API 调用），并显示该次答案的完整依据。'
+    : '当前为离线回放模式。勾选左下角「连接本地服务」后，发送才会真实问答并显示该次答案的依据。';
+  const s = active();
+  $('#modepill').textContent = s && s.recorded ? '离线回放 · 真实历史记录' : (live ? '已连接本地服务' : '离线模式');
+  $('#modepill').className = 'pill ' + (s && s.recorded ? 'rec' : (live ? 'live' : ''));
+  checkHealth();
+};
+$('#base').onchange = () => { if (live) checkHealth(); };
+
+loadDemo();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>校规问答 Agent · 决策轨迹演示</title>
+<style>
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --line:#e2e6ee; --fg:#1b2029; --muted:#6b7280;
+  --accent:#2f5fe0; --accent-soft:#eaf0ff; --ok:#0f7b4f; --err:#b42318;
+  --warn:#9a5b00; --warn-soft:#fff5e2; --chip:#f0f3f9; --code:#f6f8fc;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#101319;--panel:#191e27;--line:#2c3341;--fg:#e9edf5;--muted:#98a2b3;
+  --accent:#86a9ff;--accent-soft:#202b45;--ok:#5ad39b;--err:#ff8f85;
+  --warn:#e8b562;--warn-soft:#33291b;--chip:#232a36;--code:#141922;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:14px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif}
+header{max-width:1320px;margin:0 auto;padding:26px 20px 12px}
+h1{font-size:21px;margin:0 0 6px;letter-spacing:.2px}
+.sub{color:var(--muted);font-size:13px}
+.badge{display:inline-block;background:var(--accent-soft);color:var(--accent);
+  border-radius:5px;padding:2px 8px;font-size:12px;margin-left:8px}
+.grid{max-width:1320px;margin:0 auto;padding:12px 20px 48px;
+  display:grid;grid-template-columns:minmax(340px,0.9fr) minmax(480px,1.35fr);gap:16px}
+@media (max-width:920px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:18px;display:flex;flex-direction:column;min-height:0}
+.panel h2{font-size:14px;margin:0 0 12px;color:var(--accent);letter-spacing:.3px}
+.banner{border:1px solid var(--line);border-left:3px solid var(--warn);
+  background:var(--warn-soft);border-radius:8px;padding:10px 12px;font-size:12.5px;
+  color:var(--fg);margin-bottom:14px}
+.banner b{color:var(--warn)}
+.chat{flex:1;min-height:280px;max-height:520px;overflow:auto;
+  border:1px solid var(--line);border-radius:9px;padding:14px;background:var(--code)}
+.msg{margin-bottom:14px}
+.msg:last-child{margin-bottom:0}
+.who{font-size:12px;color:var(--muted);margin-bottom:4px}
+.bubble{white-space:pre-wrap;word-break:break-word;border-radius:8px;padding:10px 12px;
+  border:1px solid var(--line);background:var(--panel)}
+.bubble.user{background:var(--accent-soft);border-color:transparent}
+.controls{margin-top:14px;display:flex;flex-direction:column;gap:10px}
+textarea{width:100%;min-height:70px;resize:vertical;background:var(--code);color:var(--fg);
+  border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit}
+textarea:focus,select:focus,input:focus{outline:2px solid var(--accent-soft)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+select,input[type=number]{background:var(--code);color:var(--fg);border:1px solid var(--line);
+  border-radius:6px;padding:5px 8px;font:inherit}
+input[type=number]{width:62px}
+label.ck{display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 18px;
+  font:inherit;font-weight:600;cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+.hint{font-size:12px;color:var(--muted);min-height:18px}
+.meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.chip{background:var(--chip);border-radius:6px;padding:3px 9px;font-size:12px}
+.chip.ok{color:var(--ok)}.chip.err{color:var(--err)}.chip.warn{color:var(--warn)}
+.timeline{overflow:auto;max-height:600px;padding-right:4px}
+.step{border-left:2px solid var(--line);padding:0 0 16px 16px;margin-left:5px;position:relative}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:-6px;top:7px;width:9px;height:9px;
+  border-radius:50%;background:var(--accent)}
+.step.fail::before{background:var(--err)}
+.step .top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.step .name{font-weight:700}
+.step .ms{color:var(--muted);font-size:12px}
+.lbl{color:var(--muted);font-size:11.5px;margin-top:6px;letter-spacing:.4px}
+pre{white-space:pre-wrap;word-break:break-word;margin:2px 0 0;font:inherit;font-size:12.5px}
+.sect{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.sect h3{font-size:12.5px;color:var(--muted);margin:0 0 8px;font-weight:600}
+ul{margin:0;padding-left:18px;font-size:12.5px}
+li{margin-bottom:4px}
+.foot{max-width:1320px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:12px}
+code{background:var(--chip);border-radius:4px;padding:1px 5px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>校规问答 Agent · 决策轨迹<span class="badge">手写 Agent Loop</span></h1>
+  <div class="sub">观察状态 → 结构化决策 → 工具执行 → 观察 → 必要时自我修正 → 收敛。
+  左侧对话，右侧完整 trace。单文件、零依赖、不加载任何 CDN。</div>
+</header>
+
+<div class="grid">
+  <section class="panel">
+    <h2>对话</h2>
+    <div id="banner" class="banner"></div>
+    <div id="chat" class="chat"></div>
+    <div class="controls">
+      <textarea id="query" placeholder="输入校规问题，例如：学生违纪处分有哪几种？">学生违纪处分有哪几种？</textarea>
+      <div class="row">
+        <span>决策</span>
+        <select id="mode">
+          <option value="policy">policy（确定性固定流程）</option>
+          <option value="llm">llm（模型自主决策）</option>
+        </select>
+        <span>最大步数</span><input id="steps" type="number" value="6" min="1" max="12">
+      </div>
+      <div class="row">
+        <span>消融</span>
+        <label class="ck"><input type="checkbox" class="ab" value="no_vector">no_vector</label>
+        <label class="ck"><input type="checkbox" class="ab" value="no_expand">no_expand</label>
+        <label class="ck"><input type="checkbox" class="ab" value="no_rerank">no_rerank</label>
+        <label class="ck"><input type="checkbox" class="ab" value="no_verify">no_verify</label>
+      </div>
+      <div class="row">
+        <label class="ck"><input id="useBackend" type="checkbox">连接本地服务 <code>POST /agent</code></label>
+        <button id="runBtn">运行</button>
+      </div>
+      <div id="hint" class="hint"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Agent 轨迹 · thought → tool → observation</h2>
+    <div id="meta" class="meta"></div>
+    <div id="timeline" class="timeline"></div>
+    <div class="sect">
+      <h3>证据 / 校验 / 降级原因</h3>
+      <div id="extra"></div>
+    </div>
+  </section>
+</div>
+
+<div class="foot">
+  启动服务：<code>campus-rules serve</code> → 打开 <code>http://127.0.0.1:8000/demo</code>，
+  勾选「连接本地服务」即可跑真实链路。<b>真实运行会消耗模型 API 调用，须先确认调用清单并获得批准。</b>
+  本页默认展示的是一次离线真实运行记录（三项外部能力置空、0 次模型调用），不是模拟生成的答案。
+</div>
+
+<script>
+"use strict";
+
+/* 一次真实离线运行的记录：policy 模式 + no_rerank/no_vector，三项外部能力置空，
+   api_calls = 0，因此按红线拒答。用于零 API 调用即可讲解 Agent Loop 的结构。 */
+const SAMPLE = {
+  recorded: true,
+  answer: "现有校规文件中未找到该问题的明确依据，建议咨询学校相关职能部门。",
+  refused: true, degraded: true,
+  degrade_reasons: [
+    "向量召回已按配置关闭（ENABLE_VECTOR_RECALL=false），仅走 BM25",
+    "rerank 未配置：降级为规则重排（标题/关键词/条款/时效/去重）",
+    "LLM 未配置：无法生成答案，仅返回检索证据",
+    "policy 模式：确定性固定流程（消融对照组）",
+    "消融实验开启：no_rerank,no_vector"
+  ],
+  stop_reason: "refused", api_calls: 0, policy_fallbacks: 0, steps: 6,
+  decision_mode: "policy", ablations: ["no_rerank", "no_vector"],
+  query: {chars: 10, sha8: "898b61a9", rewrite_count: 0},
+  evidences: [
+    {label: "E1", citation: "【2018-11-11_上海对外经贸大学学生违纪处分管理规定｜第1页】", score: 0.61, source: "rule_rerank"},
+    {label: "E2", citation: "【2021-10-18_家庭经济困难学生认定办法｜第6页】", score: 0.57, source: "rule_rerank"},
+    {label: "E3", citation: "【2018-11-11_上海对外经贸大学学生违纪处分管理规定｜第1页】", score: 0.55, source: "rule_rerank"},
+    {label: "E4", citation: "【2020-09-17_上海对外经贸大学第二学士学位专业管理办法（试行）｜第3页】", score: 0.52, source: "rule_rerank"},
+    {label: "E5", citation: "【2018-11-11_上海对外经贸大学学生违纪处分管理规定｜第9页】", score: 0.49, source: "rule_rerank"}
+  ],
+  verification: {}, version_conflicts: [],
+  trace: [
+    {step: 1, action: "retrieve", args: {}, thought: "[规则策略] 第 1 步，按固定顺序执行 retrieve", observation: "召回[BM25 120] → 融合 120 → 扩展 224 → 规则预筛 211 块", ok: true, ms: 415.16},
+    {step: 2, action: "rerank", args: {}, thought: "[规则策略] 第 2 步，按固定顺序执行 rerank", observation: "规则重排（未调用 API）：保留 211 块", ok: true, ms: 0.01},
+    {step: 3, action: "check_version", args: {}, thought: "[规则策略] 第 3 步，按固定顺序执行 check_version", observation: "未检测到版本冲突", ok: true, ms: 0.04},
+    {step: 4, action: "pack_evidence", args: {}, thought: "[规则策略] 第 4 步，按固定顺序执行 pack_evidence", observation: "打包 5 条证据：E1 学生违纪处分管理规定｜第1页、E2 家庭经济困难学生认定办法｜第6页、E3 学生违纪处分管理规定｜第1页、E4 第二学士学位专业管理办法｜第3页、E5 学生违纪处分管理规定｜第9页", ok: true, ms: 0.02},
+    {step: 5, action: "answer", args: {}, thought: "[规则策略] 第 5 步，按固定顺序执行 answer", observation: "生成失败：LLM 未配置，仅能展示检索证据（见 degrade_reasons）", ok: true, ms: 0.0},
+    {step: 6, action: "refuse", args: {reason: "固定流程结束，证据不足以作答"}, thought: "[规则策略] 固定流程已走完，仍未得到已验证答案，收敛为拒答", observation: "按红线拒答：固定流程结束，证据不足以作答", ok: true, ms: 0.0}
+  ]
+};
+
+function esc(v) {
+  return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+    return {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c];
+  });
+}
+function argsText(a) {
+  if (!a || Object.keys(a).length === 0) return "{}";
+  try { return JSON.stringify(a); } catch (e) { return String(a); }
+}
+function chip(k, v, cls) {
+  return '<span class="chip ' + (cls || "") + '">' + esc(k) + "：" + esc(v) + "</span>";
+}
+
+function render(d, recorded) {
+  var q = d.query || {};
+  document.getElementById("banner").innerHTML = recorded
+    ? "<b>离线回放</b>：下面是一次<b>真实的离线运行记录</b>（外部能力全部置空、0 次模型调用），"
+      + "因此按准确性红线拒答。它用于零 API 调用讲解循环结构，不是模拟生成的答案。"
+    : "<b>真实运行</b>：以下结果来自 <code>POST /agent</code>，已消耗模型 API 调用。";
+
+  var userText = recorded ? "学生违纪处分有哪几种？（离线回放用例）" : (window.__lastQuery || "");
+  document.getElementById("chat").innerHTML =
+    '<div class="msg"><div class="who">用户</div><div class="bubble user">' + esc(userText) + "</div></div>" +
+    '<div class="msg"><div class="who">助手 · ' + esc(d.decision_mode || "-") + " 模式</div>" +
+    '<div class="bubble">' + esc(d.answer || "（无答案）") + "</div></div>";
+
+  var m = [
+    chip("终止", d.stop_reason || "-", d.stop_reason === "verified" ? "ok" : "warn"),
+    chip("步数", d.steps != null ? d.steps : (d.trace || []).length),
+    chip("模型调用", d.api_calls != null ? d.api_calls : "-"),
+    chip("决策回退", d.policy_fallbacks != null ? d.policy_fallbacks : 0),
+    chip("拒答", d.refused ? "是" : "否", d.refused ? "warn" : "ok"),
+    chip("降级", d.degraded ? "是" : "否", d.degraded ? "warn" : "ok"),
+    chip("消融", (d.ablations || []).join(",") || "无"),
+    chip("查询指纹", "chars=" + (q.chars != null ? q.chars : "?") + " sha8=" + (q.sha8 || "-"))
+  ];
+  document.getElementById("meta").innerHTML = m.join("");
+
+  var steps = d.trace || [];
+  document.getElementById("timeline").innerHTML = steps.map(function (t) {
+    return '<div class="step ' + (t.ok ? "" : "fail") + '">' +
+      '<div class="top"><span class="name">#' + esc(t.step) + " " + esc(t.action) + "</span>" +
+      '<span class="ms">' + esc(t.ms) + " ms · " + (t.ok ? "成功" : "失败") + "</span></div>" +
+      '<div class="lbl">THOUGHT</div><pre>' + esc(t.thought || "-") + "</pre>" +
+      '<div class="lbl">ARGS</div><pre>' + esc(argsText(t.args)) + "</pre>" +
+      '<div class="lbl">OBSERVATION</div><pre>' + esc(t.observation || "-") + "</pre></div>";
+  }).join("") || '<div class="hint">（无执行步骤）</div>';
+
+  var ev = (d.evidences || []).map(function (e) {
+    return "<li>" + esc(e.label) + " " + esc(e.citation) +
+      " <span class=\"ms\">score=" + esc(e.score) + " [" + esc(e.source) + "]</span></li>";
+  }).join("") || "<li>（无）</li>";
+  var vf = d.verification && Object.keys(d.verification).length
+    ? "ok=" + esc(d.verification.ok) + " · method=" + esc(d.verification.method) +
+      " · issues=" + ((d.verification.issues || []).length)
+    : "（未执行：未生成答案）";
+  var rs = (d.degrade_reasons || []).map(function (r) { return "<li>" + esc(r) + "</li>"; }).join("") || "<li>（无）</li>";
+  var cf = (d.version_conflicts || []).map(function (r) { return "<li>" + esc(r) + "</li>"; }).join("") || "<li>（无）</li>";
+  document.getElementById("extra").innerHTML =
+    "<ul>" + ev + "</ul><div class=\"lbl\">引用校验：" + vf + "</div>" +
+    '<div class="lbl" style="margin-top:8px">版本冲突</div><ul>' + cf + "</ul>" +
+    '<div class="lbl" style="margin-top:8px">降级原因</div><ul>' + rs + "</ul>";
+}
+
+function setHint(text, isError) {
+  var el = document.getElementById("hint");
+  el.textContent = text || "";
+  el.style.color = isError ? "var(--err)" : "var(--muted)";
+}
+
+async function runAgent() {
+  var btn = document.getElementById("runBtn");
+  var q = document.getElementById("query").value.trim();
+  if (!q) { setHint("请先输入问题。", true); return; }
+  if (!document.getElementById("useBackend").checked) {
+    setHint("当前是离线回放模式。勾选「连接本地服务」并启动 campus-rules serve 后可发起真实问答（会消耗模型 API 调用）。", false);
+    return;
+  }
+  var ablations = Array.prototype.slice.call(document.querySelectorAll(".ab:checked")).map(function (x) { return x.value; });
+  var body = {
+    query: q,
+    session_id: "demo",
+    mode: document.getElementById("mode").value,
+    max_steps: Number(document.getElementById("steps").value) || 6,
+    ablations: ablations
+  };
+  window.__lastQuery = q;
+  btn.disabled = true;
+  setHint("正在请求 POST /agent …", false);
+  try {
+    var resp = await fetch("/agent", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(body)
+    });
+    var data = await resp.json();
+    if (!resp.ok) throw new Error("HTTP " + resp.status + " " + (data.detail || ""));
+    render(data, false);
+    setHint("完成。模型调用 " + (data.api_calls != null ? data.api_calls : "?") + " 次，步数 " + (data.steps != null ? data.steps : "?") + "。", false);
+  } catch (e) {
+    setHint("请求失败：" + e.message + "。请确认已启动 campus-rules serve 且从 /demo 打开本页。", true);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+document.getElementById("runBtn").addEventListener("click", runAgent);
+render(SAMPLE, true);
+setHint("离线回放已就绪：0 次模型调用。", false);
+</script>
+</body>
+</html>
